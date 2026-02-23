@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lecturas 2026</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap');
+
+    :root {
+      --bg: #d4e5d4;
+      --card: #ffffff;
+      --border: #b8cfb8;
+      --accent: #2d5c3f;
+      --text: #1f3329;
+      --muted: #5a7560;
+      --light: #7a9580;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 40px 20px 80px;
+    }
+
+    .page {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      padding: 60px 20px 50px;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 50px;
+    }
+    .header h1 {
+      font-family: 'Crimson Pro', Georgia, serif;
+      font-size: 56px;
+      font-weight: 300;
+      color: var(--accent);
+      letter-spacing: -1px;
+      margin-bottom: 12px;
+    }
+    .header .year {
+      font-size: 18px;
+      color: var(--muted);
+      font-weight: 400;
+      letter-spacing: 2px;
+    }
+    .header .stats {
+      margin-top: 20px;
+      font-size: 14px;
+      color: var(--light);
+    }
+
+    /* Filters and Sort - New compact design */
+    .controls-wrapper {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .dropdown-container {
+      position: relative;
+    }
+
+    .dropdown-btn {
+      padding: 10px 20px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+      font-family: 'Inter', sans-serif;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+    }
+
+    .dropdown-btn:hover {
+      background: var(--bg);
+      border-color: var(--accent);
+    }
+
+    .dropdown-btn::after {
+      content: '▼';
+      font-size: 10px;
+      color: var(--muted);
+    }
+
+    .dropdown-menu {
+      position: absolute;
+      top: calc(100% + 5px);
+      left: 0;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      min-width: 200px;
+      z-index: 1000;
+      display: none;
+    }
+
+    .dropdown-menu.show {
+      display: block;
+    }
+
+    .dropdown-item {
+      padding: 10px 16px;
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--text);
+      transition: background 0.15s;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dropdown-item:last-child {
+      border-bottom: none;
+    }
+
+    .dropdown-item:hover {
+      background: var(--bg);
+    }
+
+    .dropdown-item.active {
+      background: rgba(45, 95, 63, 0.1);
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    /* Submenu styles */
+    .dropdown-item.has-submenu {
+      position: relative;
+    }
+
+    .dropdown-item.has-submenu::after {
+      content: '▶';
+      font-size: 10px;
+      margin-left: auto;
+      color: var(--muted);
+    }
+
+    .submenu {
+      position: absolute;
+      left: 100%;
+      top: 0;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      min-width: 180px;
+      max-height: 400px;
+      overflow-y: auto;
+      display: none;
+    }
+
+    .dropdown-item:hover .submenu {
+      display: block;
+    }
+
+    .results-count {
+      text-align: center;
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 30px;
+    }
+
+    /* Book entry */
+    .book-entry {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 40px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      transition: opacity 0.3s;
+    }
+
+    .book-entry.hidden {
+      display: none;
+    }
+
+    .book-header {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: 30px;
+      padding: 30px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .book-cover {
+      width: 180px;
+      height: 270px;
+      object-fit: cover;
+      border-radius: 4px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .book-info-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .book-number {
+      font-family: 'Crimson Pro', Georgia, serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: 2px;
+    }
+
+    /* Genre badge */
+    .genre-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .genre-badge.fantasia {
+      background: rgba(147, 51, 234, 0.15);
+      color: #6b21a8;
+    }
+
+    .genre-badge.thriller {
+      background: rgba(220, 38, 38, 0.15);
+      color: #991b1b;
+    }
+
+    .genre-badge.ciencia-ficcion {
+      background: rgba(59, 130, 246, 0.15);
+      color: #1e40af;
+    }
+
+    .genre-badge.terror {
+      background: rgba(30, 30, 30, 0.2);
+      color: #1a1a1a;
+    }
+
+    /* Saga badge */
+    .saga-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      background: rgba(218, 165, 32, 0.15);
+      color: #b8860b;
+      margin-left: 8px;
+    }
+
+    .book-title {
+      font-family: 'Crimson Pro', Georgia, serif;
+      font-size: 32px;
+      font-weight: 400;
+      color: var(--text);
+      line-height: 1.2;
+      margin-bottom: 4px;
+    }
+
+    .book-author {
+      font-size: 16px;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+
+    .book-meta {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px 24px;
+      font-size: 13px;
+    }
+
+    .meta-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .meta-label {
+      font-weight: 600;
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .meta-value {
+      color: var(--text);
+    }
+
+    /* Star rating */
+    .rating {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 18px;
+      color: #fbbf24;
+      margin-top: 8px;
+    }
+
+    .star {
+      position: relative;
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+    }
+
+    .star::before {
+      content: '☆';
+      position: absolute;
+      color: #d1d5db;
+    }
+
+    .star.full::before {
+      content: '★';
+      color: #fbbf24;
+    }
+
+    .star.half::before {
+      content: '★';
+      color: #fbbf24;
+      width: 45%;
+      overflow: hidden;
+      position: absolute;
+    }
+
+    .star.half::after {
+      content: '☆';
+      position: absolute;
+      color: #d1d5db;
+    }
+
+    .book-review {
+      padding: 30px;
+    }
+
+    .review-label {
+      font-family: 'Crimson Pro', Georgia, serif;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    .review-text {
+      font-size: 15px;
+      line-height: 1.7;
+      color: var(--text);
+    }
+
+    .review-text p {
+      margin-bottom: 12px;
+    }
+
+    .review-text p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      margin-top: 60px;
+      padding-top: 30px;
+      border-top: 1px solid var(--border);
+      font-size: 13px;
+      color: var(--light);
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .book-header {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+      .book-cover {
+        width: 100%;
+        max-width: 200px;
+        height: auto;
+        aspect-ratio: 2/3;
+        margin: 0 auto;
+      }
+      .book-title {
+        font-size: 26px;
+      }
+      .book-meta {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Print styles */
+    @media print {
+      body { 
+        background: white; 
+        padding: 20px;
+      }
+      .book-entry {
+        page-break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #ddd;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <h1>Biblioteca Personal</h1>
+    <div class="year">2026 —</div>
+    <div class="stats"><span id="totalCount">5</span> libros</div>
+  </div>
+
+  <!-- CONTROLS: FILTERS + SORT -->
+  <div class="controls-wrapper">
+    
+    <!-- FILTER DROPDOWN -->
+    <div class="dropdown-container">
+      <button class="dropdown-btn" id="filterBtn">Filtrar</button>
+      <div class="dropdown-menu" id="filterMenu">
+        
+        <div class="dropdown-item has-submenu">
+          Valoración
+          <div class="submenu">
+            <div class="dropdown-item filter-option" data-filter="rating" data-value="all">Todas</div>
+            <div class="dropdown-item filter-option" data-filter="rating" data-value="5">★★★★★</div>
+            <div class="dropdown-item filter-option" data-filter="rating" data-value="4">★★★★</div>
+            <div class="dropdown-item filter-option" data-filter="rating" data-value="3">★★★</div>
+            <div class="dropdown-item filter-option" data-filter="rating" data-value="2">★★</div>
+            <div class="dropdown-item filter-option" data-filter="rating" data-value="1">★</div>
+          </div>
+        </div>
+
+        <div class="dropdown-item has-submenu">
+          Autor
+          <div class="submenu">
+            <div class="dropdown-item filter-option" data-filter="author" data-value="all">Todos</div>
+            <div class="dropdown-item filter-option" data-filter="author" data-value="Brandon Sanderson">Brandon Sanderson</div>
+            <div class="dropdown-item filter-option" data-filter="author" data-value="J.D. Barker">J.D. Barker</div>
+            <div class="dropdown-item filter-option" data-filter="author" data-value="Robin Hobb">Robin Hobb</div>
+            <div class="dropdown-item filter-option" data-filter="author" data-value="Adrian Tchaikovsky">Adrian Tchaikovsky</div>
+            <div class="dropdown-item filter-option" data-filter="author" data-value="Robert Jordan">Robert Jordan</div>
+          </div>
+        </div>
+
+        <div class="dropdown-item has-submenu">
+          Género
+          <div class="submenu">
+            <div class="dropdown-item filter-option" data-filter="genre" data-value="all">Todos</div>
+            <div class="dropdown-item filter-option" data-filter="genre" data-value="Fantasía">Fantasía</div>
+            <div class="dropdown-item filter-option" data-filter="genre" data-value="Thriller">Thriller</div>
+            <div class="dropdown-item filter-option" data-filter="genre" data-value="Ciencia Ficción">Ciencia Ficción</div>
+            <div class="dropdown-item filter-option" data-filter="genre" data-value="Terror">Terror</div>
+          </div>
+        </div>
+
+        <div class="dropdown-item has-submenu">
+          Año
+          <div class="submenu">
+            <div class="dropdown-item filter-option" data-filter="year" data-value="all">Todos</div>
+            <div class="dropdown-item filter-option" data-filter="year" data-value="2026">2026</div>
+          </div>
+        </div>
+
+        <div class="dropdown-item has-submenu">
+          Saga
+          <div class="submenu">
+            <div class="dropdown-item filter-option" data-filter="saga" data-value="all">Todas</div>
+            <div class="dropdown-item filter-option" data-filter="saga" data-value="Cosmere">Cosmere</div>
+            <div class="dropdown-item filter-option" data-filter="saga" data-value="Elderlings">Elderlings</div>
+            <div class="dropdown-item filter-option" data-filter="saga" data-value="La Rueda del Tiempo">La Rueda del Tiempo</div>
+            <div class="dropdown-item filter-option" data-filter="saga" data-value="El Círculo del Mundo">El Círculo del Mundo</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SORT DROPDOWN -->
+    <div class="dropdown-container">
+      <button class="dropdown-btn" id="sortBtn">Ordenar por: Más reciente</button>
+      <div class="dropdown-menu" id="sortMenu">
+        <div class="dropdown-item sort-option active" data-sort="newest">Más reciente primero</div>
+        <div class="dropdown-item sort-option" data-sort="oldest">Más antiguo primero</div>
+        <div class="dropdown-item sort-option" data-sort="rating-high">Valoración (alta)</div>
+        <div class="dropdown-item sort-option" data-sort="rating-low">Valoración (baja)</div>
+        <div class="dropdown-item sort-option" data-sort="author">Autor (A-Z)</div>
+        <div class="dropdown-item sort-option" data-sort="genre">Género (A-Z)</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="results-count">Mostrando <span id="count">5</span> libros</div>
+
+  <!-- LIBRO 1 -->
+  <div class="book-entry" data-rating="4.5" data-author="Brandon Sanderson" data-genre="Fantasía" data-year="2026" data-saga="Cosmere">
+    <div class="book-header">
+      <img src="portadas/libro1.jpg" alt="Portada" class="book-cover" alt="Portada" class="book-cover">
+      <div class="book-info-grid">
+        <div>
+          <span class="genre-badge fantasia">Fantasía</span>
+          <span class="saga-badge">Cosmere</span>
+        </div>
+        <div>
+          <div class="book-title">Isla de la Ascua Oscura</div>
+          <div class="book-author">Brandon Sanderson</div>
+        </div>
+        <div class="book-meta">
+          <div class="meta-item">
+            <div class="meta-label">Traductor/a</div>
+            <div class="meta-value">Manu Viciano</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Editorial</div>
+            <div class="meta-value">Nova</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Año publicación</div>
+            <div class="meta-value">2025</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Lectura</div>
+            <div class="meta-value">20 Noviembre 2025 – 4 enero 2026</div>
+          </div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-label">Valoración</div>
+          <div class="rating">
+            <span class="star full"></span>
+            <span class="star full"></span>
+            <span class="star full"></span>
+            <span class="star full"></span>
+            <span class="star half"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="book-review">
+      <div class="review-label">Opinión</div>
+      <div class="review-text">
+        <p>Es el libro de Brandon que más he disfrutado desde seguramente El Ritmo de la Guerra. Me encanta Ocaso y como parece que todo vuelve un poco a sus inicios, cuando el Cosmere era más sencillo. Ha sido como reencontrarme con el Brandon que más me gusta y eso siempre es bien.</p>
+        <p>Toda la trama de Astrífera me gusta mucho también y deja conceptos importantes a nivel de Cosmere que serán importantes para entender lo que se viene. Ojalá tendiera más a este tipo de historias, pero es evidente que el Cosmere que plantea Brandon va por otros derroteros. Aún así, espero que siempre tenga hueco para este tipo de historias. Ocaso te quiero.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIBRO 2 -->
+  <div class="book-entry" data-rating="4" data-author="J.D. Barker" data-genre="Thriller" data-year="2026" data-saga="none">
+    <div class="book-header">
+      <img src="portadas/libro2.jpg" alt="Portada" class="book-cover">
+      <div class="book-info-grid">
+        <div class="genre-badge thriller">Thriller</div>
+        <div>
+          <div class="book-title">El Cuarto Mono</div>
+          <div class="book-author">J.D. Barker</div>
+        </div>
+        <div class="book-meta">
+          <div class="meta-item">
+            <div class="meta-label">Traductor/a</div>
+            <div class="meta-value">Julio Hermoso</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Editorial</div>
+            <div class="meta-value">Planeta</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Año publicación</div>
+            <div class="meta-value">2018 (ed. español)</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Lectura</div>
+            <div class="meta-value">6 enero – 12 enero 2026</div>
+          </div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-label">Valoración</div>
+          <div class="rating">
+            <span class="star full"></span>
+            <span class="star full"></span>
+            <span class="star full"></span>
+            <span class="star full"></span>
+            <span class="star"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="book-review">
+      <div class="review-label">Opinión</div>
+      <div class="review-text">
+        <p>De vez en cuando, entre libros enormes, sagas de fantasía gigantes, ciencia ficción enrevesada... Me gusta leer un buen thriller. Les suelo pedir poco: que me evada de conceptos y worldbuilding inmensos y me traiga la típica historia policiaca intentando atrapar a un asesino. Pues grata sorpresa: me ha gustado mucho. Sin duda, es de los thrillers que más me han gustado de los últimos que habré leído, sobretodo por los flashbacks del diario y por la profundidad que trata de darle a las motivaciones del asesino. Sin duda, toda su trama se roba la historia. Que bien entran este tipo de historias de vez en cuando, y más si está bien hecha.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIBRO 3 -->
+  <div class="book-entry" data-rating="5" data-author="Robin Hobb" data-genre="Fantasía" data-year="2026" data-saga="Elderlings">
+    <div class="book-header">
+      <img src="portadas/libro3.jpg" alt="Portada" class="book-cover">
+      <div class="book-info-grid">
+        <div>
+          <span class="genre-badge fantasia">Fantasía</span>
+          <span class="saga-badge">Elderlings</span>
+        </div>
+        <div>
+          <div class="book-title">La Búsqueda del Asesino</div>
+          <div class="book-author">Robin Hobb</div>
+        </div>
+        <div class="book-meta">
+          <div class="meta-item">
+            <div class="meta-label">Traductor/a</div>
+            <div class="meta-value">Manuel de los Reyes</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Editorial</div>
+            <div class="meta-value">Nocturna</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Año publicación</div>
+            <div class="meta-value">2024 (ed. español Nocturna)</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Lectura</div>
+            <div class="meta-value">13 enero – 11 febrero 2026</div>
+          </div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-label">Valoración</div>
+          <div class="rating">
+            <span class="star full"></span>
+            <span class="star full"></span>
+            <span class="star full"></span>
+            <span class="star full"></span>
+            <span class="star full"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="book-review">
+      <div class="review-label">Opinión</div>
+      <div class="review-text">
+        <p>El cierre de la trilogía del Vatídico me parece sublime y en la línea de los otros 2 libros que leí de la autora. El grado de introspección en este libro es alto y el desarrollo de sus personajes a mí me parece lo más realista que he tenido el gusto de leer en un libro. El desarrollo de Traspié aquí puede desesperar a más de uno pero párate a pensar en lo que ha pasado con él a lo largo de su vida, ¿Acaso tú actuarías diferente? Desde fuera es muy sencillo valorar que bien o mal actúa pero para mí lo dificil de escribir a un personaje es que tome decisiones que se sientan reales, no que satisfaga lo que presupones que debe hacer. Y en estos términos, en esta liga, Robin Hobb es dueña y señora. Bueno y el sistema mágico a mí me maravilla. La Maña me parece una idea tremenda y que se amolda perfectamente al estilo de desarrollo de la historia que plantea Hobb. Y Ojos de Noche. Ya está, no digo más. En fin, deseando seguir leyendo este universo y seguir disfrutando a una de mis autoras favoritas, sin duda alguna. </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIBRO 4 -->
+  <div class="book-entry" data-rating="3.5" data-author="Adrian Tchaikovsky" data-genre="Ciencia Ficción" data-year="2026" data-saga="none">
+    <div class="book-header">
+      <img src="portadas/libro4.jpg" alt="Portada" class="book-cover">
+      <div class="book-info-grid">
+        <div class="genre-badge ciencia-ficcion">Ciencia Ficción</div>
+        <div>
+          <div class="book-title">Herederos del Tiempo</div>
+          <div class="book-author">Adrian Tchaikovsky</div>
+        </div>
+        <div class="book-meta">
+          <div class="meta-item">
+            <div class="meta-label">Traductor/a</div>
+            <div class="meta-value">Luis García Prado</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Editorial</div>
+            <div class="meta-value">Alamut</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Año publicación</div>
+            <div class="meta-value">2019 (ed. español)</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Lectura</div>
+            <div class="meta-value">11 febrero – 18 febrero 2026</div>
+          </div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-label">Valoración</div>
+          <div class="rating">
+            <span class="star full"></span>
+            <span class="star full"></span>
+            <span class="star full"></span>
+            <span class="star half"></span>
+            <span class="star"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="book-review">
+      <div class="review-label">Opinión</div>
+      <div class="review-text">
+        <p>Es el primer libro que leo de Adrian Tchaikovsky y mi primera impresión es que me gusta... pero hasta ahí. Los primeros dos tercios del libro son irregulares, con tramos de narración que se hacen pesados con la esperanza de que lo que cuenta, que al final es de lo que va el libro, suene interesante e innovador. En algunos temas si que me ha parecido interesante lo que plantea, pero en otras ideas no, por lo que no ha terminado de convencerme. La trama del planeta de Kern me parece por mucho la más interesante de las dos, con un planteamiento bastante divertido. La trama de la Gilgamesh me ha parecido más aburrida. Muchas vueltas a lo mismo y un mensaje que queda claro cuando lo repites 2 o 3 veces, sin ser necesario repertirlo hasta la saciedad. El último tercio del libro me ha gustado bastante más y cierra el libro bastante bien y con ganas de leer su continuación que, eso sí, no va a suceder pronto.</p>
+      </div>
+    </div>
+  </div>
+
+<!-- LIBRO 5 -->
+  <div class="book-entry" data-rating="0" data-author="Robert Jordan" data-genre="Fantasía" data-year="2026" data-saga="La Rueda del Tiempo">
+    <div class="book-header">
+      <img src="portadas/libro5.jpg" alt="Portada" class="book-cover">
+      <div class="book-info-grid">
+        <div>
+          <span class="genre-badge fantasia">Fantasía</span>
+          <span class="saga-badge">La Rueda del Tiempo</span>
+        </div>
+        <div>
+          <div class="book-title">El Ojo del Mundo</div>
+          <div class="book-author">Robert Jordan</div>
+        </div>
+        <div class="book-meta">
+          <div class="meta-item">
+            <div class="meta-label">Traductor/a</div>
+            <div class="meta-value">Dollors Gallart</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Editorial</div>
+            <div class="meta-value">Minotauro</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Año publicación</div>
+            <div class="meta-value">2019 (ed. español Minotauro)</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Lectura</div>
+            <div class="meta-value">18 febrero –  ¿? 2026</div>
+          </div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-label">Valoración</div>
+          <div class="rating">
+            <span class="star"></span>
+            <span class="star"></span>
+            <span class="star"></span>
+            <span class="star"></span>
+            <span class="star"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="book-review">
+      <div class="review-label">Opinión</div>
+      <div class="review-text">
+        <p>En proceso de lectura.</p>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <p>Registro de lecturas · Actualizado febrero 2026</p>
+  </div>
+
+</div>
+
+<!-- 
+═══════════════════════════════════════════════════════════════════
+INSTRUCCIONES PARA EDITAR:
+
+1. AÑADIR UN NUEVO LIBRO:
+   - Copia todo el bloque desde LIBRO 4 hasta </div> (antes del footer)
+   - Pégalo justo antes del footer
+   - Cambia el número (LIBRO #5, etc.)
+   - Edita título, autor, metadatos y reseña
+
+2. CAMBIAR PORTADAS:
+   - Reemplaza la URL en src="..." con:
+     a) Ruta local: src="portadas/libro1.jpg" (pon las imágenes en una carpeta "portadas")
+     b) URL directa de una imagen online
+   - Mantén el tamaño 180x270 o proporción 2:3 para mejor resultado
+
+3. VALORACIÓN CON ESTRELLAS:
+   - class="star full" = estrella llena
+   - class="star half" = media estrella  
+   - class="star" = estrella vacía
+
+4. COLORES:
+   - Ve a la sección :root {} al principio
+   - Cambia los valores hexadecimales:
+     --accent: #2d5c3f (verde bosque, para títulos)
+     --bg: #d4e5d4 (fondo matcha)
+     --text: #1f3329 (texto principal)
+
+5. EXPORTAR A PDF:
+   - Abre el HTML en tu navegador
+   - Ctrl+P o Cmd+P (imprimir)
+   - Selecciona "Guardar como PDF"
+   - Ajusta márgenes si es necesario
+
+6. COMPARTIR EN REDES SOCIALES:
+   - Para X/Twitter: haz capturas de pantalla de cada libro individual
+   - Para web: sube el HTML a GitHub Pages, Netlify o cualquier hosting
+   - Alternativa: usa https://htmlpreview.github.io/ pegando la URL de tu HTML en GitHub
+
+═══════════════════════════════════════════════════════════════════
+-->
+
+<script>
+// Sistema de filtros y ordenación con dropdowns anidados
+const books = document.querySelectorAll('.book-entry');
+const countSpan = document.getElementById('count');
+const totalCountSpan = document.getElementById('totalCount');
+const totalBooks = books.length;
+
+// Actualizar contador total en el header
+totalCountSpan.textContent = totalBooks;
+
+// Inicializar el texto del contador con singular/plural correcto
+const countContainer = document.querySelector('.results-count');
+countContainer.innerHTML = `Mostrando <span id="count">${totalBooks}</span> ${totalBooks === 1 ? 'libro' : 'libros'}`;
+
+// Dropdown toggles
+const filterBtn = document.getElementById('filterBtn');
+const filterMenu = document.getElementById('filterMenu');
+const sortBtn = document.getElementById('sortBtn');
+const sortMenu = document.getElementById('sortMenu');
+
+// Toggle dropdowns
+filterBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  filterMenu.classList.toggle('show');
+  sortMenu.classList.remove('show');
+});
+
+sortBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  sortMenu.classList.toggle('show');
+  filterMenu.classList.remove('show');
+});
+
+// Close dropdowns when clicking outside
+document.addEventListener('click', () => {
+  filterMenu.classList.remove('show');
+  sortMenu.classList.remove('show');
+});
+
+// Prevent closing when clicking inside menus
+filterMenu.addEventListener('click', (e) => e.stopPropagation());
+sortMenu.addEventListener('click', (e) => e.stopPropagation());
+
+// Estado actual de los filtros
+let activeFilters = {
+  rating: 'all',
+  author: 'all',
+  genre: 'all',
+  year: 'all',
+  saga: 'all'
+};
+
+let currentSort = 'newest';
+let booksArray = Array.from(books);
+
+// Función para agrupar valoraciones (redondeo hacia abajo con medias)
+function matchesRatingGroup(bookRating, filterRating) {
+  if (filterRating === 'all') return true;
+  
+  const rating = parseFloat(bookRating);
+  const filter = parseInt(filterRating);
+  
+  // Agrupación: 1★ incluye 0.5-1.5, 2★ incluye 2-2.5, etc.
+  // 5★ solo incluye 5
+  if (filter === 5) {
+    return rating === 5;
+  } else if (filter === 4) {
+    return rating >= 4 && rating < 5;
+  } else if (filter === 3) {
+    return rating >= 3 && rating < 4;
+  } else if (filter === 2) {
+    return rating >= 2 && rating < 3;
+  } else if (filter === 1) {
+    return rating >= 0.5 && rating < 2;
+  }
+  
+  return false;
+}
+
+// Función para aplicar filtros
+function applyFilters() {
+  let visibleCount = 0;
+  
+  books.forEach(book => {
+    const bookRating = book.getAttribute('data-rating');
+    const bookAuthor = book.getAttribute('data-author');
+    const bookGenre = book.getAttribute('data-genre');
+    const bookYear = book.getAttribute('data-year');
+    const bookSaga = book.getAttribute('data-saga');
+    
+    const matchesRating = matchesRatingGroup(bookRating, activeFilters.rating);
+    const matchesAuthor = activeFilters.author === 'all' || bookAuthor === activeFilters.author;
+    const matchesGenre = activeFilters.genre === 'all' || bookGenre === activeFilters.genre;
+    const matchesYear = activeFilters.year === 'all' || bookYear === activeFilters.year;
+    const matchesSaga = activeFilters.saga === 'all' || bookSaga === activeFilters.saga;
+    
+    if (matchesRating && matchesAuthor && matchesGenre && matchesYear && matchesSaga) {
+      book.classList.remove('hidden');
+      book.style.order = ''; // Reset order
+      visibleCount++;
+    } else {
+      book.classList.add('hidden');
+    }
+  });
+  
+  // Actualizar texto singular/plural
+  const countContainer = document.querySelector('.results-count');
+  countContainer.innerHTML = `Mostrando <span id="count">${visibleCount}</span> ${visibleCount === 1 ? 'libro' : 'libros'}`;
+  
+  // Aplicar ordenación después de filtrar
+  if (currentSort !== 'default') {
+    applySorting();
+  } else {
+    // Si no hay ordenación activa, asegurar que el footer esté al final
+    const footer = document.querySelector('.footer');
+    if (footer) {
+      footer.style.order = visibleCount;
+    }
+  }
+}
+
+// Función para aplicar ordenación
+function applySorting() {
+  const container = books[0].parentElement;
+  const visibleBooks = booksArray.filter(book => !book.classList.contains('hidden'));
+  
+  visibleBooks.sort((a, b) => {
+    switch(currentSort) {
+      case 'newest':
+        // Orden inverso (más reciente primero) - el último libro añadido arriba
+        return booksArray.indexOf(b) - booksArray.indexOf(a);
+      case 'oldest':
+        // Orden cronológico (más antiguo primero) - el primer libro arriba
+        return booksArray.indexOf(a) - booksArray.indexOf(b);
+      case 'rating-high':
+        return parseFloat(b.getAttribute('data-rating')) - parseFloat(a.getAttribute('data-rating'));
+      case 'rating-low':
+        return parseFloat(a.getAttribute('data-rating')) - parseFloat(b.getAttribute('data-rating'));
+      case 'author':
+        return a.getAttribute('data-author').localeCompare(b.getAttribute('data-author'));
+      case 'genre':
+        return a.getAttribute('data-genre').localeCompare(b.getAttribute('data-genre'));
+      default:
+        return 0;
+    }
+  });
+  
+  // Reordenar en el DOM
+  visibleBooks.forEach((book, index) => {
+    book.style.order = index;
+  });
+  
+  // Posicionar el footer siempre después del último libro
+  const footer = document.querySelector('.footer');
+  if (footer) {
+    footer.style.order = visibleBooks.length; // Siempre después del último libro visible
+  }
+}
+
+// Event listeners para filtros
+const filterOptions = document.querySelectorAll('.filter-option');
+filterOptions.forEach(option => {
+  option.addEventListener('click', (e) => {
+    e.stopPropagation();
+    
+    const filterType = option.getAttribute('data-filter');
+    const filterValue = option.getAttribute('data-value');
+    
+    // Remover active de opciones del mismo tipo
+    filterOptions.forEach(opt => {
+      if (opt.getAttribute('data-filter') === filterType) {
+        opt.classList.remove('active');
+      }
+    });
+    
+    // Activar opción clickeada
+    option.classList.add('active');
+    
+    // Actualizar filtro
+    activeFilters[filterType] = filterValue;
+    
+    // Aplicar filtros
+    applyFilters();
+    
+    // Cerrar menú
+    filterMenu.classList.remove('show');
+  });
+});
+
+// Event listeners para ordenación
+const sortOptions = document.querySelectorAll('.sort-option');
+sortOptions.forEach(option => {
+  option.addEventListener('click', (e) => {
+    e.stopPropagation();
+    
+    const sortType = option.getAttribute('data-sort');
+    
+    // Remover active de todas las opciones de sort
+    sortOptions.forEach(opt => opt.classList.remove('active'));
+    
+    // Activar opción clickeada
+    option.classList.add('active');
+    
+    // Actualizar sort
+    currentSort = sortType;
+    
+    // Actualizar texto del botón
+    sortBtn.textContent = 'Ordenar por: ' + option.textContent;
+    
+    // Aplicar ordenación
+    applySorting();
+    
+    // Cerrar menú
+    sortMenu.classList.remove('show');
+  });
+});
+
+// Asegurar que el contenedor de libros use flexbox para poder ordenar
+const booksContainer = books[0].parentElement;
+booksContainer.style.display = 'flex';
+booksContainer.style.flexDirection = 'column';
+
+// Aplicar orden por defecto (más reciente primero) al cargar la página
+applySorting();
+</script>
+
+</body>
+</html>
